@@ -1,5 +1,9 @@
+#-*- coding: UTF-8 -*-
+
 import scipy as sp
 import os
+from sys import argv
+
 import cv2
 # from scipy.misc import imread
 from scipy.signal.signaltools import correlate2d as c2d
@@ -7,8 +11,7 @@ from scipy.signal.signaltools import correlate2d as c2d
 
 def get(path):
     data = cv2.imread(path)
-    data = sp.inner(data, [299, 587, 114]) / 1000.0
-    return (data - data.mean()) / data.std()
+    return data
 
 
 def load_images_from_folder(folder):
@@ -41,10 +44,34 @@ def delete_folder(file_list):
     return result
 
 
-file_list = get_image_from_subsection(load_images_from_folder("compare"), 'compare')
+def byte_compare(image_1, image_2):
+    return True
+
+
+script, first = argv
+first = first.replace("\\", "/")
+file_list = get_image_from_subsection(load_images_from_folder(first), first)
 file_list = delete_folder(file_list)
 
-# for image in file_list:
+i = 0
+for image in file_list:
+  if os.path.exists(image):
+      stream_image = os.stat(image)
+      j = 0
+      for compare_image in file_list:
+        if not i == j:
+            if os.path.exists(compare_image):
+                stream_compare_image = os.stat(compare_image)
+                if stream_compare_image.st_size == stream_image.st_size:
+                    # print(c2d(get(image), get(compare_image), mode='same'))
+                    if byte_compare(image, compare_image):
+                        os.remove(compare_image)
+
+        j += 1
+  i += 1
+
+file_list = get_image_from_subsection(load_images_from_folder(first), first)
+file_list = delete_folder(file_list)
 
 
 print(file_list)
