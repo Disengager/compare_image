@@ -2,6 +2,10 @@
 
 import scipy as sp
 import os
+# import Image
+from PIL import Image
+from PIL import ImageChops
+
 from sys import argv
 
 import cv2
@@ -44,8 +48,10 @@ def delete_folder(file_list):
     return result
 
 
-def byte_compare(image_1, image_2):
-    return True
+def byte_compare(image_file_1, image_file_2):
+    image_1 = Image.open(image_file_1)
+    image_2 = Image.open(image_file_2)
+    return ImageChops.difference(image_1, image_2).getbbox() is None
 
 
 script, first = argv
